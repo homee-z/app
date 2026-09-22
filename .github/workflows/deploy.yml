@@ -74,22 +74,22 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/homeez-front:${{ github.sha }}
             ghcr.io/${{ github.repository }}/homeez-front:latest
-  deploy:
-    name: Deploy
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    # on vérifie si le push vient de la branche main et si les secrets sont présents
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.VPS_HOST != ''
-    steps:
-      - name: Execute Remote SSH Commands on VPS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /opt/homeez
-            export TAG=${{ github.sha }}
-            docker compose -f compose.prod.yml pull
-            docker compose -f compose.prod.yml up -d
+
+# deploy:
+#   name: Deploy
+#   needs: build-and-push
+#   runs-on: ubuntu-latest
+#   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#   steps:
+#     - name: Execute Remote SSH Commands on VPS
+#       uses: appleboy/ssh-action@v1
+#       with:
+#         host: ${{ secrets.VPS_HOST }}
+#         username: ${{ secrets.VPS_USER }}
+#         key: ${{ secrets.VPS_SSH_KEY }}
+#         script: |
+#           cd /opt/homeez
+#           export TAG=${{ github.sha }}
+#           docker compose -f compose.prod.yml pull
+#           docker compose -f compose.prod.yml up -d
 
