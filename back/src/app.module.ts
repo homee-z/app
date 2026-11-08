@@ -5,11 +5,13 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './infrastructure/frameworks/nest/database/database.module';
+import { UsersModule } from './infrastructure/frameworks/nest/users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    UsersModule,
     ThrottlerModule.forRoot([
       {
         name: 'default',
