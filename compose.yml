@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   front:
     build:
@@ -11,10 +9,8 @@ services:
       - "${FRONT_PORT:-3000}:3000"
     volumes:
       - ./front:/usr/src/app
-      - /usr/src/app/node_modules
+      - /usr/src/app/node_moduleso
       - /usr/src/app/.next
-    env_file:
-      - .env
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
