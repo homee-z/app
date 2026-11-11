@@ -9,16 +9,19 @@ function MagicLinkVerifyContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    token ? 'loading' : 'error',
+  );
+  const [errorMessage, setErrorMessage] = useState<string>(
+    token ? '' : 'Aucun token de validation fourni.',
+  );
 
   useEffect(() => {
     if (!token) {
-      setStatus('error');
-      setErrorMessage('Aucun token de validation fourni.');
       return;
     }
 
+    let isMounted = true;
     const verifyToken = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -35,21 +38,29 @@ function MagicLinkVerifyContent() {
           throw new Error(data.message || 'Lien invalide ou expiré');
         }
 
-        setStatus('success');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1500);
+        if (isMounted) {
+          setStatus('success');
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 1500);
+        }
       } catch (err: unknown) {
-        setStatus('error');
-        if (err instanceof Error) {
-          setErrorMessage(err.message);
-        } else {
-          setErrorMessage('Erreur lors de la validation du lien magique');
+        if (isMounted) {
+          setStatus('error');
+          if (err instanceof Error) {
+            setErrorMessage(err.message);
+          } else {
+            setErrorMessage('Erreur lors de la validation du lien magique');
+          }
         }
       }
     };
 
     verifyToken();
+
+    return () => {
+      isMounted = false;
+    };
   }, [token, router]);
 
   return (
@@ -85,4 +96,3 @@ export default function MagicLinkVerifyPage() {
     </Suspense>
   );
 }
-
