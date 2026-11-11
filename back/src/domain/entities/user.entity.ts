@@ -1,105 +1,168 @@
 import { Email } from '../value-objects/email.value-object';
 
-export type UserRole = 'admin' | 'member' | 'guest';
+export const USER_ROLES = ['admin', 'member', 'guest'] as const;
+export type UserRole = (typeof USER_ROLES)[number];
 
 export interface UserProps {
   id: string;
   email: Email;
   passwordHash: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  role?: UserRole;
+  householdId?: string | null;
   avatarUrl?: string | null;
-  role: UserRole;
-  isVerified: boolean;
+  isVerified?: boolean;
   verificationToken?: string | null;
-  twoFactorEnabled: boolean;
+  twoFactorEnabled?: boolean;
   twoFactorSecret?: string | null;
-  passwordChangedAt: Date;
-  failedLoginAttempts: number;
+  passwordChangedAt?: Date;
+  failedLoginAttempts?: number;
   lockUntil?: Date | null;
+  lockedUntil?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export class User {
-  private props: UserProps;
+  public readonly id: string;
+  public email: Email;
+  public passwordHash: string;
+  public firstName: string;
+  public lastName: string;
+  public role: UserRole;
+  public householdId: string | null;
+  public avatarUrl: string | null;
+  public isVerified: boolean;
+  public verificationToken: string | null;
+  public twoFactorEnabled: boolean;
+  public twoFactorSecret: string | null;
+  public passwordChangedAt: Date;
+  public failedLoginAttempts: number;
+  public lockedUntil: Date | null;
+  public readonly createdAt: Date;
+  public updatedAt: Date;
 
-  constructor(props: UserProps) {
-    this.props = {
-      ...props,
-      avatarUrl: props.avatarUrl ?? null,
-      verificationToken: props.verificationToken ?? null,
-      twoFactorSecret: props.twoFactorSecret ?? null,
-      lockUntil: props.lockUntil ?? null,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date(),
-    };
+  constructor(
+    propsOrId: UserProps | string,
+    name?: string,
+    email?: Email,
+    passwordHash?: string,
+    role?: UserRole,
+    householdId: string | null = null,
+    avatarUrl: string | null = null,
+    passwordChangedAt: Date = new Date(),
+    failedLoginAttempts: number = 0,
+    lockedUntil: Date | null = null,
+    createdAt: Date = new Date(),
+  ) {
+    if (typeof propsOrId === 'string') {
+      this.id = propsOrId;
+      this.email = email!;
+      this.passwordHash = passwordHash!;
+      this.role = role ?? 'member';
+      this.householdId = householdId;
+      this.avatarUrl = avatarUrl;
+      this.passwordChangedAt = passwordChangedAt;
+      this.failedLoginAttempts = failedLoginAttempts;
+      this.lockedUntil = lockedUntil;
+      this.createdAt = createdAt;
+      this.updatedAt = new Date();
+
+      const nameParts = (name ?? '').trim().split(' ');
+      this.firstName = nameParts[0] || '';
+      this.lastName = nameParts.slice(1).join(' ') || '';
+      this.isVerified = false;
+      this.verificationToken = null;
+      this.twoFactorEnabled = false;
+      this.twoFactorSecret = null;
+    } else {
+      const props = propsOrId;
+      this.id = props.id;
+      this.email = props.email;
+      this.passwordHash = props.passwordHash;
+      this.firstName =
+        props.firstName ?? (props.name ? props.name.split(' ')[0] : '');
+      this.lastName =
+        props.lastName ??
+        (props.name ? props.name.split(' ').slice(1).join(' ') : '');
+      this.role = props.role ?? 'member';
+      this.householdId = props.householdId ?? null;
+      this.avatarUrl = props.avatarUrl ?? null;
+      this.isVerified = props.isVerified ?? false;
+      this.verificationToken = props.verificationToken ?? null;
+      this.twoFactorEnabled = props.twoFactorEnabled ?? false;
+      this.twoFactorSecret = props.twoFactorSecret ?? null;
+      this.passwordChangedAt = props.passwordChangedAt ?? new Date();
+      this.failedLoginAttempts = props.failedLoginAttempts ?? 0;
+      this.lockedUntil = props.lockedUntil ?? props.lockUntil ?? null;
+      this.createdAt = props.createdAt ?? new Date();
+      this.updatedAt = props.updatedAt ?? new Date();
+    }
   }
 
-  public get id(): string { return this.props.id; }
-  public get email(): Email { return this.props.email; }
-  public get passwordHash(): string { return this.props.passwordHash; }
-  public get firstName(): string { return this.props.firstName; }
-  public get lastName(): string { return this.props.lastName; }
-  public get avatarUrl(): string | null { return this.props.avatarUrl ?? null; }
-  public get role(): UserRole { return this.props.role; }
-  public get isVerified(): boolean { return this.props.isVerified; }
-  public get verificationToken(): string | null { return this.props.verificationToken ?? null; }
-  public get twoFactorEnabled(): boolean { return this.props.twoFactorEnabled; }
-  public get twoFactorSecret(): string | null { return this.props.twoFactorSecret ?? null; }
-  public get passwordChangedAt(): Date { return this.props.passwordChangedAt; }
-  public get failedLoginAttempts(): number { return this.props.failedLoginAttempts; }
-  public get lockUntil(): Date | null { return this.props.lockUntil ?? null; }
-  public get createdAt(): Date { return this.props.createdAt!; }
-  public get updatedAt(): Date { return this.props.updatedAt!; }
+  public get name(): string {
+    return `${this.firstName} ${this.lastName}`.trim() || this.firstName;
+  }
+
+  public get lockUntil(): Date | null {
+    return this.lockedUntil;
+  }
+
+  public set lockUntil(date: Date | null) {
+    this.lockedUntil = date;
+  }
 
   public recordFailedLogin(lockoutDurationMinutes = 15, maxAttempts = 5): void {
-    this.props.failedLoginAttempts += 1;
-    if (this.props.failedLoginAttempts >= maxAttempts) {
+    this.failedLoginAttempts += 1;
+    if (this.failedLoginAttempts >= maxAttempts) {
       const now = new Date();
-      this.props.lockUntil = new Date(now.getTime() + lockoutDurationMinutes * 60 * 1000);
+      this.lockedUntil = new Date(
+        now.getTime() + lockoutDurationMinutes * 60 * 1000,
+      );
     }
-    this.props.updatedAt = new Date();
+    this.updatedAt = new Date();
   }
 
   public recordSuccessfulLogin(): void {
-    this.props.failedLoginAttempts = 0;
-    this.props.lockUntil = null;
-    this.props.updatedAt = new Date();
+    this.failedLoginAttempts = 0;
+    this.lockedUntil = null;
+    this.updatedAt = new Date();
   }
 
   public isLocked(): boolean {
-    if (!this.props.lockUntil) return false;
-    return this.props.lockUntil.getTime() > Date.now();
+    if (!this.lockedUntil) return false;
+    return this.lockedUntil.getTime() > Date.now();
   }
 
-  public isPasswordExpired(maxDays = 60): boolean { //reco CNIL
+  public isPasswordExpired(maxDays = 60): boolean {
     const maxAgeMs = maxDays * 24 * 60 * 60 * 1000;
-    const ageMs = Date.now() - this.props.passwordChangedAt.getTime();
+    const ageMs = Date.now() - this.passwordChangedAt.getTime();
     return ageMs > maxAgeMs;
   }
 
   public updatePassword(newPasswordHash: string): void {
-    this.props.passwordHash = newPasswordHash;
-    this.props.passwordChangedAt = new Date();
-    this.props.updatedAt = new Date();
+    this.passwordHash = newPasswordHash;
+    this.passwordChangedAt = new Date();
+    this.updatedAt = new Date();
   }
 
   public verifyEmail(): void {
-    this.props.isVerified = true;
-    this.props.verificationToken = null;
-    this.props.updatedAt = new Date();
+    this.isVerified = true;
+    this.verificationToken = null;
+    this.updatedAt = new Date();
   }
 
   public enableTwoFactor(secret: string): void {
-    this.props.twoFactorEnabled = true;
-    this.props.twoFactorSecret = secret;
-    this.props.updatedAt = new Date();
+    this.twoFactorEnabled = true;
+    this.twoFactorSecret = secret;
+    this.updatedAt = new Date();
   }
 
   public disableTwoFactor(): void {
-    this.props.twoFactorEnabled = false;
-    this.props.twoFactorSecret = null;
-    this.props.updatedAt = new Date();
+    this.twoFactorEnabled = false;
+    this.twoFactorSecret = null;
+    this.updatedAt = new Date();
   }
 }

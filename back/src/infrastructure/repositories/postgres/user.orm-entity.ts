@@ -1,15 +1,25 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { USER_ROLES, UserRole } from '../../../domain/entities/user.entity';
 
 @Entity('users')
-export class UserTypeOrmEntity {
+export class UserOrmEntity {
   @PrimaryColumn('uuid')
   id: string;
+
+  @Column({ name: 'first_name', default: '' })
+  firstName: string;
+
+  @Column({ name: 'last_name', default: '' })
+  lastName: string;
+
+  @Column({ nullable: true })
+  name: string | null;
 
   @Column({ unique: true })
   email: string;
@@ -17,17 +27,14 @@ export class UserTypeOrmEntity {
   @Column({ name: 'password_hash' })
   passwordHash: string;
 
-  @Column({ name: 'first_name' })
-  firstName: string;
+  @Column({ type: 'enum', enum: USER_ROLES, default: 'member' })
+  role: UserRole;
 
-  @Column({ name: 'last_name' })
-  lastName: string;
+  @Column({ name: 'household_id', type: 'uuid', nullable: true })
+  householdId: string | null;
 
   @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
   avatarUrl: string | null;
-
-  @Column({ type: 'varchar', default: 'member' })
-  role: 'admin' | 'member' | 'guest';
 
   @Column({ name: 'is_verified', default: false })
   isVerified: boolean;
@@ -47,8 +54,8 @@ export class UserTypeOrmEntity {
   @Column({ name: 'failed_login_attempts', default: 0 })
   failedLoginAttempts: number;
 
-  @Column({ name: 'lock_until', type: 'timestamp', nullable: true })
-  lockUntil: Date | null;
+  @Column({ name: 'locked_until', type: 'timestamp', nullable: true })
+  lockedUntil: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

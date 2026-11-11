@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './infrastructure/frameworks/nest/database/database.module';
 import { AuthModule } from './infrastructure/frameworks/nest/auth.module';
+import { UsersModule } from './infrastructure/frameworks/nest/users/users.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './infrastructure/frameworks/nest/auth.module';
     }),
     DatabaseModule,
     AuthModule,
+    UsersModule,
     ThrottlerModule.forRoot([
       {
         name: 'default',
