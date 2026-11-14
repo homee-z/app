@@ -5,9 +5,30 @@ Application de gestion de foyer partagé — corvées, courses, calendrier, chat
 > Projet annuel — ESGI Paris, Master 2 Ingénierie du Web (2026–2027)
 > Équipe : Karen, Lyly, Elias, Dane
 
+## Fonctionnalités
+
+### MVP
+
+- **Authentification** : email/mot de passe, connexion OAuth2, Magic Link (sans mot de passe), authentification à deux facteurs (2FA)
+- **Gestion de foyer** : création ou adhésion à un foyer, gestion des membres et de leurs rôles
+- **Dashboard** : vue d'ensemble avec calendrier et tâches assignées à l'utilisateur connecté
+- **Corvées** : suivi des tâches ménagères sous forme de tableau kanban (à faire / en cours / terminé)
+- **Listes de courses** : création et gestion de listes partagées, liées aux corvées ou aux recettes
+- **Chat** : messagerie de groupe en temps réel entre les membres d'un foyer
+- **Notifications** : alertes push et email sur les événements clés (corvée assignée, invitation, etc.)
+- **Paramètres** : gestion du profil utilisateur et des informations du foyer
+
+### Post-MVP
+
+- **Recettes** : bibliothèque de recettes avec liaison automatique vers les listes de courses
+- **Budget** : suivi des dépenses du foyer
+- **Rappels** : notifications programmées pour des tâches ou événements ponctuels
+- **Synchronisation calendrier externe** : import des événements depuis Google Calendar, Outlook ou Apple Calendar (fonctionnalité abandonnable selon le temps disponible)
+
 ## Sommaire
 
 - [Prérequis](#prérequis)
+- [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
 - [Variables d'environnement](#variables-denvironnement)
 - [Lancer le projet en local](#lancer-le-projet-en-local)
