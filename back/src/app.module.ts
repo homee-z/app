@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './infrastructure/frameworks/nest/database/database.module';
 import { AuthModule } from './infrastructure/frameworks/nest/auth.module';
 import { UsersModule } from './infrastructure/frameworks/nest/users/users.module';
+import { UsersHttpModule } from './infrastructure/frameworks/nest/users/users-http.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from './infrastructure/frameworks/nest/users/users.module
     DatabaseModule,
     AuthModule,
     UsersModule,
+    UsersHttpModule,
     ThrottlerModule.forRoot([
       {
         name: 'default',
