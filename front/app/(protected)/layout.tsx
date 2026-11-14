@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { UnauthorizedError } from "@/lib/error";
+import { UnauthorizedError } from "@/lib/errors";
 import type { User } from "@/types/user-types";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {

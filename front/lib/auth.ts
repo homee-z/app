@@ -1,7 +1,7 @@
 // lib/auth.ts
 import { cookies } from "next/headers";
-import { UnauthorizedError } from "@/lib/error";
-import type { User } from "@/types/user-types";
+import { UnauthorizedError } from "@/lib/errors";
+import type { User } from "@/types/user.types";
 
 export async function getCurrentUser(): Promise<User> {
     const token = (await cookies()).get("access_token")?.value;
