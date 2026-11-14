@@ -13,8 +13,6 @@ services:
       - ./front:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/.next
-    env_file:
-      - .env
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
@@ -32,8 +30,6 @@ services:
     volumes:
       - ./back:/usr/src/app
       - /usr/src/app/node_modules
-    env_file:
-      - .env
     environment:
       - PORT=3001
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -42,6 +38,11 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN}
       - FRONTEND_URL=${FRONTEND_URL}
+      - MAIL_HOST=${MAIL_HOST:-}
+      - MAIL_PORT=${MAIL_PORT:-1025}
+      - MAIL_USER=${MAIL_USER:-}
+      - MAIL_PASS=${MAIL_PASS:-}
+      - MAIL_FROM=${MAIL_FROM:-noreply@homeez.fr}
     depends_on:
       postgres:
         condition: service_healthy
