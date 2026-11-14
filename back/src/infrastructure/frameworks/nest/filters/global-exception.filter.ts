@@ -7,12 +7,30 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { DomainError } from '../../../../domain/errors/domain.error';
+import { NotFoundError } from '../../../../domain/errors/not-found.error';
+import { ConflictError } from '../../../../domain/errors/conflict.error';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+
+    if (exception instanceof NotFoundError) {
+      response.status(HttpStatus.NOT_FOUND).json({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: exception.message,
+      });
+      return;
+    }
+
+    if (exception instanceof ConflictError) {
+      response.status(HttpStatus.CONFLICT).json({
+        statusCode: HttpStatus.CONFLICT,
+        message: exception.message,
+      });
+      return;
+    }
 
     if (exception instanceof DomainError) {
       response.status(HttpStatus.BAD_REQUEST).json({
