@@ -50,9 +50,6 @@ export async function refreshToken(): Promise<boolean> {
   const res = await fetch(`${BASE_URL}/auth/refresh`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      Cookie: `access_token=${refreshToken}`,
-    },
   });
 
   return res.ok;
