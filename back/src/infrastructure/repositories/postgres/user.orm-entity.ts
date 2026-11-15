@@ -48,18 +48,18 @@ export class UserOrmEntity {
   @Column({ name: 'two_factor_secret', type: 'varchar', nullable: true })
   twoFactorSecret: string | null;
 
-  @Column({ name: 'password_changed_at', type: 'timestamp' })
+  @Column({ name: 'password_changed_at', type: 'timestamptz' })
   passwordChangedAt: Date;
 
   @Column({ name: 'failed_login_attempts', default: 0 })
   failedLoginAttempts: number;
 
-  @Column({ name: 'locked_until', type: 'timestamp', nullable: true })
+  @Column({ name: 'locked_until', type: 'timestamptz', nullable: true })
   lockedUntil: Date | null;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 }
