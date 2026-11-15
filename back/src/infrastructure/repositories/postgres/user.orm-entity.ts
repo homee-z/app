@@ -18,7 +18,7 @@ export class UserOrmEntity {
   @Column({ name: 'last_name', default: '' })
   lastName: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   name: string | null;
 
   @Column({ unique: true })
