@@ -171,6 +171,95 @@ export default function ProfilPage() {
           </button>
         </form>
 
+        {/* TODO: brancher GET /users/me/households quand Households existe */}
+        <section className={`${card} space-y-3.5`}>
+          <h2 className={cardTitle}>Vos foyers</h2>
+          <div className="flex items-center justify-between rounded-xl bg-[#faf9f6] px-3.5 py-3">
+            <div>
+              <p className="text-[13.5px] font-bold text-[#20241b]">Foyer Martin</p>
+              <p className="text-[11.5px] text-[#8a8577]">Admin · 4 membres</p>
+            </div>
+            <button
+              type="button"
+              disabled
+              title="Bientôt disponible"
+              className="rounded-[9px] border border-[#e6e2da] bg-white px-3 py-2 text-xs font-bold text-[#25291f] disabled:cursor-not-allowed"
+            >
+              Gérer
+            </button>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-[#faf9f6] px-3.5 py-3">
+            <div>
+              <p className="text-[13.5px] font-bold text-[#20241b]">Foyer Dupont</p>
+              <p className="text-[11.5px] text-[#8a8577]">Membre · 3 membres</p>
+            </div>
+            <button
+              type="button"
+              disabled
+              title="Bientôt disponible"
+              className="rounded-[9px] border border-[#f0d9d9] bg-white px-3 py-2 text-xs font-bold text-[#b23a3a] disabled:cursor-not-allowed"
+            >
+              Quitter
+            </button>
+          </div>
+        </section>
+
+        {/* TODO: brancher avec l'auth (Karen) */}
+        <section className={`${card} space-y-3.5`}>
+          <h2 className={cardTitle}>Sécurité</h2>
+          {['Mot de passe actuel', 'Nouveau mot de passe', 'Confirmer le mot de passe'].map((p) => (
+            <input
+              key={p}
+              type="password"
+              disabled
+              placeholder={p}
+              aria-label={p}
+              className="w-full rounded-[10px] border-[1.5px] border-[#e6e2da] bg-[#faf9f6] px-3.5 py-3 text-sm placeholder:text-[#9a958d] disabled:cursor-not-allowed"
+            />
+          ))}
+          <button
+            type="button"
+            disabled
+            title="Bientôt disponible"
+            className="w-full rounded-xl bg-[#c1622a] py-3 text-sm font-bold text-white disabled:cursor-not-allowed"
+          >
+            Mettre à jour
+          </button>
+          <hr className="border-[#ece8e0]" />
+          <div className="flex items-center justify-between">
+            <span className="text-[13.5px] font-bold text-[#20241b]">Authentification 2FA</span>
+            <button
+              type="button"
+              disabled
+              title="Bientôt disponible"
+              className="rounded-[10px] border border-[#e6e2da] bg-white px-3.5 py-[9px] text-[12.5px] font-bold text-[#25291f] disabled:cursor-not-allowed"
+            >
+              Configurer
+            </button>
+          </div>
+        </section>
+
+        {/* TODO: brancher PATCH /users/me/notifications */}
+        <section className={`${card} space-y-3.5`}>
+          <h2 className={cardTitle}>Notifications</h2>
+          {[
+            { label: 'Résumé hebdomadaire', on: true },
+            { label: 'Notifications push', on: true },
+            { label: 'Rappels de corvées', on: false },
+          ].map(({ label, on }) => (
+            <div key={label} className="flex items-center justify-between">
+              <span className="text-[13.5px] text-[#20241b]">{label}</span>
+              <span
+                title="Bientôt disponible"
+                aria-disabled
+                className={`flex h-[22px] w-[38px] items-center rounded-full p-[3px] ${on ? 'justify-end bg-[#c1622a]' : 'justify-start bg-[#e6e2da]'}`}
+              >
+                <span className="size-4 rounded-full bg-white" />
+              </span>
+            </div>
+          ))}
+        </section>
+
         <section className="flex flex-col gap-3 rounded-[18px] border border-[#f0d9d9] bg-white p-5 sm:gap-4 sm:rounded-[20px] sm:p-7">
           <div>
             <h2 className="font-display font-extrabold text-[14.5px] text-[#b23a3a] sm:text-[15.5px]">
