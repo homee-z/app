@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiError, getProfile } from '@/lib/api/users.api';
+import { frenchError } from '@/lib/api/errors';
 import {
   createHousehold,
   joinHousehold,
@@ -18,16 +19,11 @@ const primaryBtn =
   'w-full rounded-xl bg-[#c1622a] px-7 py-[15px] text-[15.5px] font-bold text-white transition-colors hover:bg-[#93481a] disabled:cursor-not-allowed disabled:opacity-60';
 const backLink = 'self-start text-[13.5px] font-bold text-[#c1622a] underline';
 
-// Les messages du back sont en anglais : on traduit selon le code HTTP.
-function joinErrorMessage(err: unknown): string {
-  if (err instanceof ApiError) {
-    if (err.status === 400) return "Ce code n'est pas valide (6 caractères).";
-    if (err.status === 404) return 'Aucun foyer ne correspond à ce code.';
-    if (err.status === 409)
-      return 'Vous avez déjà une demande en cours ou vous êtes déjà membre de ce foyer.';
-  }
-  return 'Une erreur est survenue';
-}
+const JOIN_ERRORS = {
+  400: "Ce code n'est pas valide (6 caractères).",
+  404: 'Aucun foyer ne correspond à ce code.',
+  409: 'Vous avez déjà une demande en cours ou vous êtes déjà membre de ce foyer.',
+};
 
 function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   return (
@@ -92,7 +88,7 @@ export default function FoyerPage() {
       } catch (e) {
         if (e instanceof ApiError && e.status === 401) router.replace('/login');
         else {
-          setError(e instanceof Error ? e.message : 'Une erreur est survenue');
+          setError(frenchError(e));
           setView('choice');
         }
       }
@@ -112,7 +108,7 @@ export default function FoyerPage() {
       await createHousehold(name);
       router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(frenchError(err));
       setBusy(false);
     }
   }
@@ -126,7 +122,7 @@ export default function FoyerPage() {
       setPendingId(h.id);
       setView('pending');
     } catch (err) {
-      setError(joinErrorMessage(err));
+      setError(frenchError(err, JOIN_ERRORS));
     } finally {
       setBusy(false);
     }
@@ -142,7 +138,7 @@ export default function FoyerPage() {
       setCode('');
       setView('choice');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(frenchError(err));
     } finally {
       setBusy(false);
     }
