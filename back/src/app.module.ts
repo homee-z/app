@@ -8,6 +8,7 @@ import { DatabaseModule } from './infrastructure/frameworks/nest/database/databa
 import { AuthModule } from './infrastructure/frameworks/nest/auth.module';
 import { UsersModule } from './infrastructure/frameworks/nest/users/users.module';
 import { UsersHttpModule } from './infrastructure/frameworks/nest/users/users-http.module';
+import { ShoppingListsModule } from './infrastructure/frameworks/nest/shopping-lists/shopping-lists.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UsersHttpModule } from './infrastructure/frameworks/nest/users/users-ht
     AuthModule,
     UsersModule,
     UsersHttpModule,
+    ShoppingListsModule,
     ThrottlerModule.forRoot([
       {
         name: 'default',
