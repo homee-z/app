@@ -69,6 +69,25 @@ describe('HouseholdInMemoryRepository', () => {
     expect(found.map((h) => h.id).sort()).toEqual(['h1', 'h3']);
   });
 
+  it('delete supprime le foyer et ses adhésions (comme le cascade), sans toucher aux autres', async () => {
+    await households.createWithAdmin(
+      household('h1', 'ABC234'),
+      HouseholdMember.createAdmin('m1', 'u1', 'h1'),
+    );
+    await members.save(HouseholdMember.requestToJoin('m2', 'u2', 'h1'));
+    await households.createWithAdmin(
+      household('h2', 'ABC235'),
+      HouseholdMember.createAdmin('m3', 'u1', 'h2'),
+    );
+
+    await households.delete('h1');
+
+    expect(await households.findById('h1')).toBeNull();
+    expect(await members.findByHousehold('h1')).toHaveLength(0);
+    expect(await households.findById('h2')).not.toBeNull();
+    expect(await members.findByUser('u1')).toHaveLength(1);
+  });
+
   it('renvoie des copies : modifier sans save ne change pas le stock', async () => {
     await households.save(household('h1'));
     const h = await households.findById('h1');

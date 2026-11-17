@@ -54,6 +54,11 @@ export class HouseholdMemberInMemoryRepository implements HouseholdMemberReposit
     this.members.push(copy);
   }
 
+  // Équivalent du ON DELETE CASCADE : utilisé par HouseholdInMemoryRepository.delete.
+  async deleteByHousehold(householdId: string) {
+    this.members = this.members.filter((m) => m.householdId !== householdId);
+  }
+
   async delete(id: string) {
     this.members = this.members.filter((m) => m.id !== id);
   }

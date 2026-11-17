@@ -14,6 +14,9 @@ export class CreateHouseholdDto {
   name: string;
 }
 
+// Même validation de forme qu'à la création.
+export class RenameHouseholdDto extends CreateHouseholdDto {}
+
 export class JoinHouseholdDto {
   @IsString()
   @IsNotEmpty()

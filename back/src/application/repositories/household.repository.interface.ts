@@ -12,6 +12,8 @@ export interface IHouseholdRepository {
   // Crée le foyer et son premier admin en une seule opération (transaction en Postgres),
   // pour ne jamais avoir de foyer sans admin.
   createWithAdmin(household: Household, admin: HouseholdMember): Promise<void>;
+  // Supprime le foyer et toutes ses adhésions (ON DELETE CASCADE en Postgres).
+  delete(id: string): Promise<void>;
 }
 
 export type HouseholdRepositoryInterface = IHouseholdRepository;

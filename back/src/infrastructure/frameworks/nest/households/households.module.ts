@@ -27,6 +27,8 @@ import { RejectMemberUsecase } from '../../../../application/usecases/households
 import { UpdateMemberRoleUsecase } from '../../../../application/usecases/households/update-member-role.usecase';
 import { KickMemberUsecase } from '../../../../application/usecases/households/kick-member.usecase';
 import { RegenerateCodeUsecase } from '../../../../application/usecases/households/regenerate-code.usecase';
+import { RenameHouseholdUsecase } from '../../../../application/usecases/households/rename-household.usecase';
+import { DeleteHouseholdUsecase } from '../../../../application/usecases/households/delete-household.usecase';
 import { HouseholdsController } from './households.controller';
 
 type Households = HouseholdRepositoryInterface;
@@ -97,6 +99,18 @@ type Users = UserRepositoryInterface;
       provide: RegenerateCodeUsecase,
       useFactory: (households: Households, members: Members) =>
         new RegenerateCodeUsecase(households, members),
+      inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
+    },
+    {
+      provide: RenameHouseholdUsecase,
+      useFactory: (households: Households, members: Members) =>
+        new RenameHouseholdUsecase(households, members),
+      inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
+    },
+    {
+      provide: DeleteHouseholdUsecase,
+      useFactory: (households: Households, members: Members) =>
+        new DeleteHouseholdUsecase(households, members),
       inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
   ],

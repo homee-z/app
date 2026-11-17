@@ -151,6 +151,50 @@ describeDb('Household Postgres repositories (intégration)', () => {
     expect(await members.findByHousehold(h.id)).toHaveLength(0);
   });
 
+  it('save met à jour le nom du foyer', async () => {
+    const adminId = await createUser();
+    const h = newHousehold();
+    await households.createWithAdmin(
+      h,
+      HouseholdMember.createAdmin(randomUUID(), adminId, h.id),
+    );
+
+    h.rename('Famille Martin');
+    await households.save(h);
+
+    expect((await households.findById(h.id))?.name).toBe('Famille Martin');
+  });
+
+  it('delete supprime le foyer et ses adhésions en cascade, sans toucher aux autres', async () => {
+    const adminId = await createUser();
+    const memberId = await createUser();
+    const h = newHousehold();
+    const other = newHousehold();
+    await households.createWithAdmin(
+      h,
+      HouseholdMember.createAdmin(randomUUID(), adminId, h.id),
+    );
+    await households.createWithAdmin(
+      other,
+      HouseholdMember.createAdmin(randomUUID(), adminId, other.id),
+    );
+    await members.save(
+      HouseholdMember.requestToJoin(randomUUID(), memberId, h.id),
+    );
+
+    await households.delete(h.id);
+
+    expect(await households.findById(h.id)).toBeNull();
+    expect(await members.findByHousehold(h.id)).toHaveLength(0);
+    expect(await members.findByUser(memberId)).toHaveLength(0);
+    // Les utilisateurs et les autres foyers restent
+    expect(
+      await dataSource.getRepository(UserOrmEntity).countBy({ id: memberId }),
+    ).toBe(1);
+    expect(await households.findById(other.id)).not.toBeNull();
+    expect(await members.findByUser(adminId)).toHaveLength(1);
+  });
+
   it('les dates sont en timestamptz', async () => {
     const columns: { table_name: string; data_type: string }[] =
       await dataSource.query(

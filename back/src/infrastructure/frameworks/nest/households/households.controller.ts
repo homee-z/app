@@ -22,9 +22,12 @@ import { RejectMemberUsecase } from '../../../../application/usecases/households
 import { UpdateMemberRoleUsecase } from '../../../../application/usecases/households/update-member-role.usecase';
 import { KickMemberUsecase } from '../../../../application/usecases/households/kick-member.usecase';
 import { RegenerateCodeUsecase } from '../../../../application/usecases/households/regenerate-code.usecase';
+import { RenameHouseholdUsecase } from '../../../../application/usecases/households/rename-household.usecase';
+import { DeleteHouseholdUsecase } from '../../../../application/usecases/households/delete-household.usecase';
 import {
   CreateHouseholdDto,
   JoinHouseholdDto,
+  RenameHouseholdDto,
   UpdateMemberRoleDto,
 } from './household.dto';
 
@@ -46,6 +49,8 @@ export class HouseholdsController {
     private readonly updateMemberRole: UpdateMemberRoleUsecase,
     private readonly kickMember: KickMemberUsecase,
     private readonly regenerateCode: RegenerateCodeUsecase,
+    private readonly renameHousehold: RenameHouseholdUsecase,
+    private readonly deleteHousehold: DeleteHouseholdUsecase,
   ) {}
 
   @Post()
@@ -61,6 +66,21 @@ export class HouseholdsController {
   @Get('me')
   mine(@CurrentUser() user: AuthUser) {
     return this.listMyHouseholds.execute(user.sub);
+  }
+
+  @Patch(':id')
+  rename(
+    @CurrentUser() user: AuthUser,
+    @Param('id', uuid) id: string,
+    @Body() dto: RenameHouseholdDto,
+  ) {
+    return this.renameHousehold.execute(user.sub, id, dto);
+  }
+
+  // Supprime le foyer et toutes ses adhésions, même s'il reste d'autres membres (admin).
+  @Delete(':id')
+  deleteOne(@CurrentUser() user: AuthUser, @Param('id', uuid) id: string) {
+    return this.deleteHousehold.execute(user.sub, id);
   }
 
   @Get(':id/members')

@@ -53,6 +53,10 @@ export class HouseholdPostgresRepository implements IHouseholdRepository {
     });
   }
 
+  public async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
+  }
+
   private toDomain(orm: HouseholdOrmEntity): Household {
     return new Household({
       id: orm.id,

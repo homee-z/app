@@ -61,4 +61,10 @@ export class HouseholdInMemoryRepository implements HouseholdRepositoryInterface
       throw error;
     }
   }
+
+  // Comme le ON DELETE CASCADE en Postgres : les adhésions du foyer sont supprimées aussi.
+  async delete(id: string) {
+    this.households = this.households.filter((h) => h.id !== id);
+    await this.members.deleteByHousehold(id);
+  }
 }
