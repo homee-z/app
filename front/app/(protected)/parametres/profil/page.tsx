@@ -10,6 +10,7 @@ import {
   updateProfile,
   type UserProfile,
 } from '@/lib/api/users.api';
+import { HouseholdsCard } from './households-card';
 
 const card = 'rounded-[18px] bg-white p-5 sm:rounded-[20px] sm:p-7';
 const cardTitle = 'font-display font-extrabold text-[15px] text-[#20241b] sm:text-base';
@@ -171,38 +172,7 @@ export default function ProfilPage() {
           </button>
         </form>
 
-        {/* TODO: brancher GET /users/me/households quand Households existe */}
-        <section className={`${card} space-y-3.5`}>
-          <h2 className={cardTitle}>Vos foyers</h2>
-          <div className="flex items-center justify-between rounded-xl bg-[#faf9f6] px-3.5 py-3">
-            <div>
-              <p className="text-[13.5px] font-bold text-[#20241b]">Foyer Martin</p>
-              <p className="text-[11.5px] text-[#8a8577]">Admin · 4 membres</p>
-            </div>
-            <button
-              type="button"
-              disabled
-              title="Bientôt disponible"
-              className="rounded-[9px] border border-[#e6e2da] bg-white px-3 py-2 text-xs font-bold text-[#25291f] disabled:cursor-not-allowed"
-            >
-              Gérer
-            </button>
-          </div>
-          <div className="flex items-center justify-between rounded-xl bg-[#faf9f6] px-3.5 py-3">
-            <div>
-              <p className="text-[13.5px] font-bold text-[#20241b]">Foyer Dupont</p>
-              <p className="text-[11.5px] text-[#8a8577]">Membre · 3 membres</p>
-            </div>
-            <button
-              type="button"
-              disabled
-              title="Bientôt disponible"
-              className="rounded-[9px] border border-[#f0d9d9] bg-white px-3 py-2 text-xs font-bold text-[#b23a3a] disabled:cursor-not-allowed"
-            >
-              Quitter
-            </button>
-          </div>
-        </section>
+        {profile && <HouseholdsCard userId={profile.id} />}
 
         {/* TODO: brancher avec l'auth (Karen) */}
         <section className={`${card} space-y-3.5`}>
