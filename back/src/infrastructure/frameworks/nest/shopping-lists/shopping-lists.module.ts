@@ -26,13 +26,19 @@ import { DeleteShoppingItemUseCase } from '../../../../application/usecases/shop
 import { LinkShoppingItemToRecipeIngredientUseCase } from '../../../../application/usecases/shopping-lists/link-shopping-item-to-recipe-ingredient.usecase';
 import { ListShoppingItemsUseCase } from '../../../../application/usecases/shopping-lists/list-shopping-items.usecase';
 import { ShoppingListsController } from './shopping-lists.controller';
+import { ShoppingListItemsController } from './shopping-list-items.controller';
+import { ShoppingItemsController } from './shopping-items.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ShoppingListOrmEntity, ShoppingItemOrmEntity]),
     AuthModule,
   ],
-  controllers: [ShoppingListsController],
+  controllers: [
+    ShoppingListsController,
+    ShoppingListItemsController,
+    ShoppingItemsController,
+  ],
   providers: [
     {
       provide: SHOPPING_LIST_REPOSITORY,
