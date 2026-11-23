@@ -5,6 +5,8 @@ import { ShoppingListOrmEntity } from '../../../repositories/postgres/shopping-l
 import { ShoppingListPostgresRepository } from '../../../repositories/postgres/shopping-list.postgres.repository';
 import { ShoppingItemOrmEntity } from '../../../repositories/postgres/shopping-item.orm-entity';
 import { ShoppingItemPostgresRepository } from '../../../repositories/postgres/shopping-item.postgres.repository';
+import { HouseholdMemberOrmEntity } from '../../../repositories/postgres/household-member.orm-entity';
+import { HouseholdMemberPostgresRepository } from '../../../repositories/postgres/household-member.postgres.repository';
 import {
   SHOPPING_LIST_REPOSITORY,
   ShoppingListRepositoryInterface,
@@ -13,6 +15,10 @@ import {
   SHOPPING_ITEM_REPOSITORY,
   ShoppingItemRepositoryInterface,
 } from '../../../../application/repositories/shopping-item.repository.interface';
+import {
+  HOUSEHOLD_MEMBER_REPOSITORY,
+  HouseholdMemberRepositoryInterface,
+} from '../../../../application/repositories/household-member.repository.interface';
 import { CreateShoppingListUseCase } from '../../../../application/usecases/shopping-lists/create-shopping-list.usecase';
 import { UpdateShoppingListUseCase } from '../../../../application/usecases/shopping-lists/update-shopping-list.usecase';
 import { DeleteShoppingListUseCase } from '../../../../application/usecases/shopping-lists/delete-shopping-list.usecase';
@@ -29,9 +35,17 @@ import { ShoppingListsController } from './shopping-lists.controller';
 import { ShoppingListItemsController } from './shopping-list-items.controller';
 import { ShoppingItemsController } from './shopping-items.controller';
 
+type Lists = ShoppingListRepositoryInterface;
+type Items = ShoppingItemRepositoryInterface;
+type Members = HouseholdMemberRepositoryInterface;
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ShoppingListOrmEntity, ShoppingItemOrmEntity]),
+    TypeOrmModule.forFeature([
+      ShoppingListOrmEntity,
+      ShoppingItemOrmEntity,
+      HouseholdMemberOrmEntity,
+    ]),
     AuthModule,
   ],
   controllers: [
@@ -49,76 +63,104 @@ import { ShoppingItemsController } from './shopping-items.controller';
       useClass: ShoppingItemPostgresRepository,
     },
     {
+      provide: HOUSEHOLD_MEMBER_REPOSITORY,
+      useClass: HouseholdMemberPostgresRepository,
+    },
+    {
       provide: CreateShoppingListUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new CreateShoppingListUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new CreateShoppingListUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: UpdateShoppingListUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new UpdateShoppingListUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new UpdateShoppingListUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: DeleteShoppingListUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new DeleteShoppingListUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new DeleteShoppingListUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: LinkShoppingListToChoreUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new LinkShoppingListToChoreUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new LinkShoppingListToChoreUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: GetShoppingListUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new GetShoppingListUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new GetShoppingListUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: ListShoppingListsUseCase,
-      useFactory: (repo: ShoppingListRepositoryInterface) =>
-        new ListShoppingListsUseCase(repo),
-      inject: [SHOPPING_LIST_REPOSITORY],
+      useFactory: (repo: Lists, members: Members) =>
+        new ListShoppingListsUseCase(repo, members),
+      inject: [SHOPPING_LIST_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: AddShoppingItemUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new AddShoppingItemUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new AddShoppingItemUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
     {
       provide: UpdateShoppingItemUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new UpdateShoppingItemUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new UpdateShoppingItemUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
     {
       provide: ToggleShoppingItemCheckedUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new ToggleShoppingItemCheckedUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new ToggleShoppingItemCheckedUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
     {
       provide: DeleteShoppingItemUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new DeleteShoppingItemUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new DeleteShoppingItemUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
     {
       provide: LinkShoppingItemToRecipeIngredientUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new LinkShoppingItemToRecipeIngredientUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new LinkShoppingItemToRecipeIngredientUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
     {
       provide: ListShoppingItemsUseCase,
-      useFactory: (repo: ShoppingItemRepositoryInterface) =>
-        new ListShoppingItemsUseCase(repo),
-      inject: [SHOPPING_ITEM_REPOSITORY],
+      useFactory: (items: Items, lists: Lists, members: Members) =>
+        new ListShoppingItemsUseCase(items, lists, members),
+      inject: [
+        SHOPPING_ITEM_REPOSITORY,
+        SHOPPING_LIST_REPOSITORY,
+        HOUSEHOLD_MEMBER_REPOSITORY,
+      ],
     },
   ],
   exports: [
