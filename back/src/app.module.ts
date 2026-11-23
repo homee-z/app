@@ -10,6 +10,7 @@ import { UsersModule } from './infrastructure/frameworks/nest/users/users.module
 import { UsersHttpModule } from './infrastructure/frameworks/nest/users/users-http.module';
 import { ShoppingListsModule } from './infrastructure/frameworks/nest/shopping-lists/shopping-lists.module';
 import { HouseholdsModule } from './infrastructure/frameworks/nest/households/households.module';
+import { MessagesModule } from './infrastructure/frameworks/nest/messages/messages.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HouseholdsModule } from './infrastructure/frameworks/nest/households/ho
     UsersHttpModule,
     ShoppingListsModule,
     HouseholdsModule,
+    MessagesModule,
     ThrottlerModule.forRoot([
       {
         name: 'default',
