@@ -12,6 +12,8 @@ export interface HouseholdMemberProps {
   householdId: string;
   role: HouseholdRole;
   status: HouseholdMemberStatus;
+  // Foyer ouvert à la connexion : au plus un par utilisateur, et seulement une adhésion active.
+  isDefault?: boolean;
   createdAt?: Date;
 }
 
@@ -23,6 +25,7 @@ export class HouseholdMember {
   public readonly householdId: string;
   public role: HouseholdRole;
   public status: HouseholdMemberStatus;
+  public isDefault: boolean;
   public readonly createdAt: Date;
 
   constructor(props: HouseholdMemberProps) {
@@ -31,6 +34,7 @@ export class HouseholdMember {
     this.householdId = props.householdId;
     this.role = props.role;
     this.status = props.status;
+    this.isDefault = props.isDefault ?? false;
     this.createdAt = props.createdAt ?? new Date();
   }
 
@@ -38,6 +42,7 @@ export class HouseholdMember {
     id: string,
     userId: string,
     householdId: string,
+    isDefault = false,
   ): HouseholdMember {
     return new HouseholdMember({
       id,
@@ -45,6 +50,7 @@ export class HouseholdMember {
       householdId,
       role: 'admin',
       status: 'active',
+      isDefault,
     });
   }
 
