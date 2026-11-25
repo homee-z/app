@@ -36,6 +36,13 @@ export const createHousehold = (name: string) =>
 export const joinHousehold = (code: string) =>
   request<Household>('/households/join', { method: 'POST', body: JSON.stringify({ code }) });
 
+// Admin uniquement. Même règle qu'à la création : 2 à 50 caractères après trim.
+export const renameHousehold = (id: string, name: string) =>
+  request<Household>(base(id), { method: 'PATCH', body: JSON.stringify({ name }) });
+
+// Admin uniquement. Supprime le foyer et toutes ses adhésions.
+export const deleteHousehold = (id: string) => request<null>(base(id), { method: 'DELETE' });
+
 export const listMembers = (id: string) => request<HouseholdMember[]>(`${base(id)}/members`);
 
 export const approveMember = (id: string, userId: string) =>
