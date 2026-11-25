@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth.module';
+import { HouseholdsModule } from '../households/households.module';
 import { MessageOrmEntity } from '../../../repositories/postgres/message.orm-entity';
 import { MessagePostgresRepository } from '../../../repositories/postgres/message.postgres.repository';
-import { HouseholdMemberOrmEntity } from '../../../repositories/postgres/household-member.orm-entity';
-import { HouseholdMemberPostgresRepository } from '../../../repositories/postgres/household-member.postgres.repository';
 import {
   MESSAGE_REPOSITORY,
   MessageRepositoryInterface,
@@ -23,18 +22,15 @@ type Members = HouseholdMemberRepositoryInterface;
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MessageOrmEntity, HouseholdMemberOrmEntity]),
+    TypeOrmModule.forFeature([MessageOrmEntity]),
     AuthModule,
+    HouseholdsModule,
   ],
   controllers: [MessagesController],
   providers: [
     {
       provide: MESSAGE_REPOSITORY,
       useClass: MessagePostgresRepository,
-    },
-    {
-      provide: HOUSEHOLD_MEMBER_REPOSITORY,
-      useClass: HouseholdMemberPostgresRepository,
     },
     {
       provide: SendMessageUseCase,
