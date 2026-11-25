@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { UnauthorizedError } from "@/lib/errors";
 import type { User } from "@/types/user.types";
+import { AuthProvider } from "@/components/context/AuthProvider";
 
 export default async function ProtectedLayout({
   children,
@@ -27,5 +28,10 @@ export default async function ProtectedLayout({
     redirect("/foyer");
   }
 
-  return <>{children}</>;
+  return (
+    <AuthProvider user={user}>
+      {children}
+    </AuthProvider>
+  );
+  
 }
