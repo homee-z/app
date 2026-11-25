@@ -37,6 +37,8 @@ type Users = UserRepositoryInterface;
 
 // Pas de module HTTP séparé (contrairement à Users) : AuthModule n'importe pas
 // HouseholdsModule, il n'y a donc pas de dépendance circulaire.
+// Les modules qui importent HouseholdsModule ne doivent pas être importés par lui
+// (ni par AuthModule / UsersModule), pour éviter une dépendance circulaire.
 @Module({
   imports: [
     TypeOrmModule.forFeature([HouseholdOrmEntity, HouseholdMemberOrmEntity]),
@@ -114,5 +116,8 @@ type Users = UserRepositoryInterface;
       inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
   ],
+  // Exportés pour les autres modules (shopping-lists, messages…) : ils importent
+  // HouseholdsModule au lieu de redéclarer ces providers, et utilisent requireActiveMember.
+  exports: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
 })
 export class HouseholdsModule {}
