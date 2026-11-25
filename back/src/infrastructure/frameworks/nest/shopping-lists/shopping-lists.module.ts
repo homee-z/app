@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth.module';
+import { HouseholdsModule } from '../households/households.module';
 import { ShoppingListOrmEntity } from '../../../repositories/postgres/shopping-list.orm-entity';
 import { ShoppingListPostgresRepository } from '../../../repositories/postgres/shopping-list.postgres.repository';
 import { ShoppingItemOrmEntity } from '../../../repositories/postgres/shopping-item.orm-entity';
 import { ShoppingItemPostgresRepository } from '../../../repositories/postgres/shopping-item.postgres.repository';
-import { HouseholdMemberOrmEntity } from '../../../repositories/postgres/household-member.orm-entity';
-import { HouseholdMemberPostgresRepository } from '../../../repositories/postgres/household-member.postgres.repository';
 import {
   SHOPPING_LIST_REPOSITORY,
   ShoppingListRepositoryInterface,
@@ -41,12 +40,9 @@ type Members = HouseholdMemberRepositoryInterface;
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      ShoppingListOrmEntity,
-      ShoppingItemOrmEntity,
-      HouseholdMemberOrmEntity,
-    ]),
+    TypeOrmModule.forFeature([ShoppingListOrmEntity, ShoppingItemOrmEntity]),
     AuthModule,
+    HouseholdsModule,
   ],
   controllers: [
     ShoppingListsController,
@@ -61,10 +57,6 @@ type Members = HouseholdMemberRepositoryInterface;
     {
       provide: SHOPPING_ITEM_REPOSITORY,
       useClass: ShoppingItemPostgresRepository,
-    },
-    {
-      provide: HOUSEHOLD_MEMBER_REPOSITORY,
-      useClass: HouseholdMemberPostgresRepository,
     },
     {
       provide: CreateShoppingListUseCase,
