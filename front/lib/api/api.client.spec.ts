@@ -60,4 +60,17 @@ describe("apiFetch", () => {
     expect(fetchMock.mock.calls[1][0]).toContain("/auth/refresh");
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
+
+  it("lance une ApiError avec le statut et le message du back", async () => {
+  fetchMock.mockResolvedValueOnce({
+    status: 403,
+    ok: false,
+    json: async () => ({ message: "Compte verrouillé" }),
+  } as unknown as Response);
+
+  await expect(apiFetch("/auth/login")).rejects.toMatchObject({
+    status: 403,
+    message: "Compte verrouillé",
+  });
+});
 });

@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@/lib/errors";
+import { UnauthorizedError, ApiError } from "@/lib/errors";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,7 +33,25 @@ export async function apiFetch<T>(
   }
 
   if (!res.ok) {
-    throw new Error(`Erreur API : ${res.status}`);
+    let message = `Erreur API : ${res.status}`;
+    let errors: string[] | undefined;
+
+    try {
+      const json = await res.json();
+
+      if(typeof json.message === "string" && json.message){
+        message = json.message;
+      }
+
+      if(Array.isArray(json.errors)){
+        errors = json.errors;
+      }
+
+    } catch {
+      // corps vide ou pas du JSON : on garde le message par défaut
+    }
+
+    throw new ApiError(res.status, message, errors);
   }
 
   if (res.status === 204) {
