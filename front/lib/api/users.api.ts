@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { request } from './client';
+
+export { ApiError } from './client';
 
 export type UserProfile = {
   id: string;
@@ -18,31 +20,6 @@ export type UpdateProfileInput = {
   lastName?: string;
   email?: string;
 };
-
-export class ApiError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-  }
-}
-
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...init.headers },
-  });
-  const body = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    // Erreur de validation du back : { message: 'Validation failed', errors: [...] }
-    const details = body?.errors ?? body?.message;
-    throw new ApiError(
-      res.status,
-      Array.isArray(details) ? details.join(', ') : details || 'Une erreur est survenue',
-    );
-  }
-  return body?.data as T;
-}
 
 export const getProfile = () => request<UserProfile>('/users/me');
 
