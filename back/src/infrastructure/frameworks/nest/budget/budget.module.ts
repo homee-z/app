@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth.module';
+import { HouseholdsModule } from '../households/households.module';
 import { BudgetEntryOrmEntity } from '../../../repositories/postgres/budget-entry.orm-entity';
 import { BudgetEntryPostgresRepository } from '../../../repositories/postgres/budget-entry.postgres.repository';
-import { HouseholdMemberOrmEntity } from '../../../repositories/postgres/household-member.orm-entity';
-import { HouseholdMemberPostgresRepository } from '../../../repositories/postgres/household-member.postgres.repository';
 import {
   BUDGET_ENTRY_REPOSITORY,
   BudgetEntryRepositoryInterface,
@@ -24,18 +23,15 @@ type Members = HouseholdMemberRepositoryInterface;
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BudgetEntryOrmEntity, HouseholdMemberOrmEntity]),
+    TypeOrmModule.forFeature([BudgetEntryOrmEntity]),
     AuthModule,
+    HouseholdsModule,
   ],
   controllers: [BudgetController],
   providers: [
     {
       provide: BUDGET_ENTRY_REPOSITORY,
       useClass: BudgetEntryPostgresRepository,
-    },
-    {
-      provide: HOUSEHOLD_MEMBER_REPOSITORY,
-      useClass: HouseholdMemberPostgresRepository,
     },
     {
       provide: CreateBudgetEntryUseCase,
