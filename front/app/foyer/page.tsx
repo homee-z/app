@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ApiError, getProfile } from '@/lib/api/users.api';
 import { frenchError } from '@/lib/api/errors';
 import {
@@ -59,8 +59,11 @@ function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean
   );
 }
 
-export default function FoyerPage() {
+function FoyerContent() {
   const router = useRouter();
+  // Lien d'invitation : /foyer?code=K7M2QX ouvre directement « Rejoindre » avec le code rempli.
+  const params = useSearchParams();
+  const codeFromUrl = params.get('code');
   const [view, setView] = useState<View>('loading');
   const [userId, setUserId] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -82,6 +85,9 @@ export default function FoyerPage() {
         if (pending) {
           setPendingId(pending.id);
           setView('pending');
+        } else if (codeFromUrl) {
+          setCode(codeFromUrl.trim().toUpperCase());
+          setView('join');
         } else {
           setView('choice');
         }
@@ -93,7 +99,7 @@ export default function FoyerPage() {
         }
       }
     })();
-  }, [router]);
+  }, [router, codeFromUrl]);
 
   const go = (v: View) => {
     setError(null);
@@ -284,5 +290,14 @@ export default function FoyerPage() {
         </div>
       )}
     </Shell>
+  );
+}
+
+// useSearchParams doit être sous un <Suspense> (sinon `next build` échoue sur cette page).
+export default function FoyerPage() {
+  return (
+    <Suspense fallback={null}>
+      <FoyerContent />
+    </Suspense>
   );
 }
