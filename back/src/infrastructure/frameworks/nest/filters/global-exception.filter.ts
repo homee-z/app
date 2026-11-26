@@ -9,6 +9,7 @@ import { Request, Response } from 'express';
 import { DomainError } from '../../../../domain/errors/domain.error';
 import { NotFoundError } from '../../../../domain/errors/not-found.error';
 import { ConflictError } from '../../../../domain/errors/conflict.error';
+import { ForbiddenError } from '../../../../domain/errors/forbidden.error';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -19,6 +20,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof NotFoundError) {
       response.status(HttpStatus.NOT_FOUND).json({
         statusCode: HttpStatus.NOT_FOUND,
+        message: exception.message,
+      });
+      return;
+    }
+
+    if (exception instanceof ForbiddenError) {
+      response.status(HttpStatus.FORBIDDEN).json({
+        statusCode: HttpStatus.FORBIDDEN,
         message: exception.message,
       });
       return;

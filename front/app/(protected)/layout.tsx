@@ -24,9 +24,9 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  if (user.householdId === null) {
-    redirect("/foyer");
-  }
+  // if (user.householdId === null) {
+  //   redirect("/foyer");
+  // }
 
   return (
     <AuthProvider user={user}>
