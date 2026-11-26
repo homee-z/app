@@ -7,8 +7,8 @@ import {
   deleteAccount,
   getProfile,
   updateProfile,
-  type UserProfile,
 } from '@/lib/api/users.api';
+import { type UserProfile } from '@/types/user.types';
 import { HouseholdsCard } from './households-card';
 import { ApiError } from '@/lib/errors';
 

@@ -1,6 +1,6 @@
 // lib/auth.ts
 import { cookies } from "next/headers";
-import { UnauthorizedError } from "@/lib/errors";
+import { UnauthorizedError, ApiError } from "@/lib/errors";
 import type { User } from "@/types/user.types";
 
 export async function getCurrentUser(): Promise<User> {
@@ -20,7 +20,7 @@ export async function getCurrentUser(): Promise<User> {
     }
 
     if (!res.ok) {
-        throw new Error(`Erreur API : ${res.body}`);
+        throw new ApiError(res.status, `Erreur API : ${res.status}`);
     }
 
     const json = await res.json();

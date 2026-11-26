@@ -1,14 +1,8 @@
+import { HouseholdRole } from "./household-types";
+
 export type User = { 
     id : string,
-    role : UserRole,
     firstName : string,
-    householdId : string | null
-}
-
-export enum UserRole {
-    admin = 'admin',
-    member = 'member',
-    guest = 'guest'
 }
 
 export type LoginResult = {
@@ -17,7 +11,7 @@ export type LoginResult = {
         id: string;
         firstName: string;
         email: string;
-        role: UserRole;
+        role: HouseholdRole;
         householdId: string | null;
     };
 };
@@ -29,7 +23,26 @@ export type RegisterResult = {
         email: string,
         firstName: string,
         lastName: string,
-        role: UserRole,
+        role: HouseholdRole,
         isVerified: boolean,
     };
+};
+
+export type UserProfile = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'member' | 'guest';
+    householdId: string | null;
+    avatarUrl: string | null;
+    isVerified: boolean;
+    createdAt: string;
+};
+
+export type UpdateProfileInput = {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
 };

@@ -1,9 +1,9 @@
 "use client";
 import { useRole } from "@/hooks/useRole";
-import { UserRole } from "@/types/user.types";
+import { HouseholdRole } from "@/types/household-types";
 
 type RoleGuardProps = {
-    roles: UserRole[];
+    roles: HouseholdRole[];
     children: React.ReactNode;
     readOnly?: boolean;
 };

@@ -2,9 +2,16 @@ FROM node:20-alpine AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
 
+# FROM base AS development
+# RUN npm install
+# COPY . .
+# EXPOSE 3001
+# CMD ["npm", "run", "start:dev"]
+
 FROM base AS development
 RUN npm install
 COPY . .
+RUN rm -rf node_modules && npm install
 EXPOSE 3001
 CMD ["npm", "run", "start:dev"]
 
