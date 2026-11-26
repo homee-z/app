@@ -195,6 +195,75 @@ describeDb('Household Postgres repositories (intégration)', () => {
     expect(await members.findByUser(adminId)).toHaveLength(1);
   });
 
+  it("setDefault déplace le flag, et l'index partiel refuse deux foyers par défaut", async () => {
+    const userId = await createUser();
+    const h1 = newHousehold();
+    const h2 = newHousehold();
+    await households.createWithAdmin(
+      h1,
+      HouseholdMember.createAdmin(randomUUID(), userId, h1.id, true),
+    );
+    const second = HouseholdMember.createAdmin(randomUUID(), userId, h2.id);
+    await households.createWithAdmin(h2, second);
+    expect((await members.findOne(h1.id, userId))?.isDefault).toBe(true);
+    expect((await members.findOne(h2.id, userId))?.isDefault).toBe(false);
+
+    await members.setDefault(userId, h2.id);
+    expect((await members.findOne(h1.id, userId))?.isDefault).toBe(false);
+    expect((await members.findOne(h2.id, userId))?.isDefault).toBe(true);
+
+    // Écrire un 2e flag sans passer par setDefault : refusé par la base.
+    const first = (await members.findOne(h1.id, userId))!;
+    first.isDefault = true;
+    await expect(members.save(first)).rejects.toThrow();
+    expect((await members.findOne(h1.id, userId))?.isDefault).toBe(false);
+  });
+
+  it('setDefault ne touche pas aux autres utilisateurs', async () => {
+    const a = await createUser();
+    const b = await createUser();
+    const h = newHousehold();
+    await households.createWithAdmin(
+      h,
+      HouseholdMember.createAdmin(randomUUID(), a, h.id, true),
+    );
+    const other = newHousehold();
+    await households.createWithAdmin(
+      other,
+      HouseholdMember.createAdmin(randomUUID(), b, other.id, true),
+    );
+    await members.save(
+      new HouseholdMember({
+        id: randomUUID(),
+        userId: b,
+        householdId: h.id,
+        role: 'member',
+        status: 'active',
+      }),
+    );
+
+    await members.setDefault(b, h.id);
+
+    expect((await members.findOne(h.id, a))?.isDefault).toBe(true);
+    expect((await members.findOne(h.id, b))?.isDefault).toBe(true);
+    expect((await members.findOne(other.id, b))?.isDefault).toBe(false);
+  });
+
+  it('is_default vaut false par défaut, avec un index unique partiel sur user_id', async () => {
+    const [column]: { column_default: string; is_nullable: string }[] =
+      await dataSource.query(
+        `SELECT column_default, is_nullable FROM information_schema.columns
+         WHERE table_name = 'household_members' AND column_name = 'is_default'`,
+      );
+    expect(column).toEqual({ column_default: 'false', is_nullable: 'NO' });
+    const [index]: { indexdef: string }[] = await dataSource.query(
+      `SELECT indexdef FROM pg_indexes WHERE indexname = 'UQ_household_members_user_default'`,
+    );
+    expect(index.indexdef).toMatch(
+      /UNIQUE INDEX .*\(user_id\) WHERE \(?is_default = true\)?/,
+    );
+  });
+
   it('les dates sont en timestamptz', async () => {
     const columns: { table_name: string; data_type: string }[] =
       await dataSource.query(

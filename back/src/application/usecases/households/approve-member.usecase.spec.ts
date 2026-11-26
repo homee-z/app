@@ -19,6 +19,23 @@ describe('ApproveMemberUsecase', () => {
     expect((await t.members.findOne('h1', 'u3'))?.isActive()).toBe(true);
   });
 
+  it('une première adhésion validée devient le foyer par défaut', async () => {
+    const t = await setup();
+    await t.approve.execute('admin', 'h1', 'u3');
+    expect((await t.members.findOne('h1', 'u3'))?.isDefault).toBe(true);
+  });
+
+  it('le foyer par défaut existant est conservé', async () => {
+    const t = await setup();
+    await t.addHousehold('u3', 'h2', 'XYZ234');
+    await t.members.setDefault('u3', 'h2');
+
+    await t.approve.execute('admin', 'h1', 'u3');
+
+    expect((await t.members.findOne('h1', 'u3'))?.isDefault).toBe(false);
+    expect((await t.members.findOne('h2', 'u3'))?.isDefault).toBe(true);
+  });
+
   it('valider un membre déjà actif : 400', async () => {
     const t = await setup();
     await expect(t.approve.execute('admin', 'h1', 'u2')).rejects.toThrow(

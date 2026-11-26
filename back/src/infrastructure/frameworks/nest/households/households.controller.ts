@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
@@ -24,6 +25,7 @@ import { KickMemberUsecase } from '../../../../application/usecases/households/k
 import { RegenerateCodeUsecase } from '../../../../application/usecases/households/regenerate-code.usecase';
 import { RenameHouseholdUsecase } from '../../../../application/usecases/households/rename-household.usecase';
 import { DeleteHouseholdUsecase } from '../../../../application/usecases/households/delete-household.usecase';
+import { SetDefaultHouseholdUsecase } from '../../../../application/usecases/households/set-default-household.usecase';
 import {
   CreateHouseholdDto,
   JoinHouseholdDto,
@@ -51,6 +53,7 @@ export class HouseholdsController {
     private readonly regenerateCode: RegenerateCodeUsecase,
     private readonly renameHousehold: RenameHouseholdUsecase,
     private readonly deleteHousehold: DeleteHouseholdUsecase,
+    private readonly setDefaultHousehold: SetDefaultHouseholdUsecase,
   ) {}
 
   @Post()
@@ -81,6 +84,12 @@ export class HouseholdsController {
   @Delete(':id')
   deleteOne(@CurrentUser() user: AuthUser, @Param('id', uuid) id: string) {
     return this.deleteHousehold.execute(user.sub, id);
+  }
+
+  // Foyer ouvert à la connexion (membre actif). Idempotent : l'ancien perd le flag.
+  @Put(':id/default')
+  setDefault(@CurrentUser() user: AuthUser, @Param('id', uuid) id: string) {
+    return this.setDefaultHousehold.execute(user.sub, id);
   }
 
   @Get(':id/members')

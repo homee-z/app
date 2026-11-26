@@ -12,6 +12,8 @@ export interface HouseholdView {
   role: HouseholdRole;
   status: HouseholdMemberStatus;
   memberCount: number;
+  // Foyer à ouvrir à la connexion (un seul par utilisateur, parmi ses foyers actifs).
+  isDefault: boolean;
   // Seulement pour un admin actif : le code permet de rejoindre le foyer.
   code?: string;
   createdAt: Date;
@@ -37,6 +39,7 @@ export const toHouseholdView = (
   role: membership.role,
   status: membership.status,
   memberCount,
+  isDefault: membership.isDefault,
   ...(membership.isAdmin() ? { code: household.code.value } : {}),
   createdAt: household.createdAt,
 });

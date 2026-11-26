@@ -52,6 +52,7 @@ export function householdsTestSetup() {
     userId: string,
     role: HouseholdRole = 'member',
     status: HouseholdMemberStatus = 'active',
+    isDefault = false,
   ) => {
     await members.save(
       new HouseholdMember({
@@ -60,6 +61,7 @@ export function householdsTestSetup() {
         householdId,
         role,
         status,
+        isDefault,
       }),
     );
   };
