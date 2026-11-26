@@ -1,24 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "homeez-cookie-consent";
 
-export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+function subscribe() {
+  // Rien à écouter : on ne lit localStorage qu'une fois, au montage.
+  return () => {};
+}
 
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        setVisible(true);
-      }
-    } catch {
-      // localStorage indisponible (navigation privée, etc.) : on affiche quand même le bandeau
-      setVisible(true);
-    }
-  }, []);
+function getClientSnapshot() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === null;
+  } catch {
+    // localStorage indisponible (navigation privée, etc.) : on affiche quand même le bandeau
+    return true;
+  }
+}
+
+function getServerSnapshot() {
+  // Côté serveur, on ne sait pas encore si le consentement a été donné : pas de bandeau.
+  return false;
+}
+
+export default function CookieBanner() {
+  const shouldShow = useSyncExternalStore(
+    subscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
+  const [acknowledged, setAcknowledged] = useState(false);
+
+  const visible = shouldShow && !acknowledged;
 
   const acknowledge = () => {
     try {
@@ -26,7 +40,7 @@ export default function CookieBanner() {
     } catch {
       // ignore
     }
-    setVisible(false);
+    setAcknowledged(true);
   };
 
   if (!visible) return null;
