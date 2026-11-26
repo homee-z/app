@@ -1,9 +1,9 @@
-import { apiFetch } from "@/lib/api/api.client";
+import { request } from "@/lib/api/api.client";
 import { LoginResult, RegisterResult } from "@/types/user.types";
 
 
 export async function login(email: string, password: string) : Promise<LoginResult> {
-    return apiFetch<LoginResult>(
+    return request<LoginResult>(
         "/auth/login",
         {
             method : "POST",
@@ -13,7 +13,7 @@ export async function login(email: string, password: string) : Promise<LoginResu
 }
 
 export async function logout() : Promise<{ message: string }> {
-    return apiFetch<{ message: string }>(
+    return request<{ message: string }>(
         "/auth/logout",
         {
             method : "POST",
@@ -22,7 +22,7 @@ export async function logout() : Promise<{ message: string }> {
 }
 
 export async function register(email: string, password: string, firstName: string, lastName: string) : Promise<RegisterResult> { 
-    return apiFetch<RegisterResult>(
+    return request<RegisterResult>(
         "/auth/register",
         {
             method : "POST",

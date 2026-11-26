@@ -1,6 +1,5 @@
-import { request } from './client';
-
-export { ApiError } from './client';
+import { request } from "@/lib/api/api.client";
+export { ApiError } from '@/lib/errors';
 
 export type HouseholdRole = 'admin' | 'member' | 'guest';
 export type HouseholdMemberStatus = 'pending' | 'active';

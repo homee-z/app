@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { frenchError } from '@/lib/api/errors';
+import { frenchError } from '@/lib/errors';
 import { listMyHouseholds, removeMember, type Household } from '@/lib/api/households.api';
 
 const card = 'rounded-[18px] bg-white p-5 sm:rounded-[20px] sm:p-7';

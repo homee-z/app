@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
-import { apiFetch } from "@/lib/api/api.client";
+import { request } from "@/lib/api/api.client";
 
 const fetchMock = jest.fn<typeof fetch>();
 
@@ -8,7 +8,7 @@ beforeEach(() => {
   global.fetch = fetchMock;
 });
 
-describe("apiFetch", () => {
+describe("request", () => {
   it("it should sendback json.data when the response is an 200", async () => {
     fetchMock.mockResolvedValue({
       status: 200,
@@ -16,7 +16,7 @@ describe("apiFetch", () => {
       json: async () => ({ data: { id: 1 } }),
     } as unknown as Response);
 
-    const result = await apiFetch<{ id: number }>("/chores");
+    const result = await request<{ id: number }>("/chores");
 
     expect(result).toEqual({ id: 1 });
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -28,7 +28,7 @@ describe("apiFetch", () => {
       ok: true,
     } as unknown as Response);
 
-    const result = await apiFetch<void>("/dashboard");
+    const result = await request<void>("/dashboard");
 
     expect(result).toBeUndefined();
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -54,7 +54,7 @@ describe("apiFetch", () => {
         }),
       } as unknown as Response);
 
-    const result = await apiFetch<{ id: number }>("/chores");
+    const result = await request<{ id: number }>("/chores");
 
     expect(result).toEqual({ id: 1 });
     expect(fetchMock.mock.calls[1][0]).toContain("/auth/refresh");
@@ -68,7 +68,7 @@ describe("apiFetch", () => {
     json: async () => ({ message: "Compte verrouillé" }),
   } as unknown as Response);
 
-  await expect(apiFetch("/auth/login")).rejects.toMatchObject({
+  await expect(request("/auth/login")).rejects.toMatchObject({
     status: 403,
     message: "Compte verrouillé",
   });

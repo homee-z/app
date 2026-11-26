@@ -2,14 +2,15 @@
 
 import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ApiError, getProfile } from '@/lib/api/users.api';
-import { frenchError } from '@/lib/api/errors';
+import { getProfile } from '@/lib/api/users.api';
+import { frenchError } from '@/lib/errors';
 import {
   createHousehold,
   joinHousehold,
   listMyHouseholds,
   removeMember,
 } from '@/lib/api/households.api';
+import { ApiError } from '@/lib/errors';
 
 type View = 'loading' | 'choice' | 'create' | 'join' | 'pending';
 

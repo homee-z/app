@@ -18,7 +18,7 @@ import {
   type HouseholdMember,
   type HouseholdRole,
 } from '@/lib/api/households.api';
-import { frenchError } from '@/lib/api/errors';
+import { frenchError } from '@/lib/errors';
 
 const AVATAR_COLORS = ['#c1622a', '#2f6f4e', '#5b3e8c', '#3e6b8c'];
 const ROLE_LABEL: Record<HouseholdRole, string> = {

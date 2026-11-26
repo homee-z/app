@@ -1,6 +1,4 @@
-import { request } from './client';
-
-export { ApiError } from './client';
+import { request } from "@/lib/api/api.client";
 
 export type UserProfile = {
   id: string;
