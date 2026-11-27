@@ -1,15 +1,19 @@
 "use client";
-import { useAuth } from "@/hooks/useAuth";
-import { UserRole } from "@/types/user.types";
+import { useContext } from "react";
+import { HouseholdContext } from "@/components/context/HouseholdProvider";
 
 export function useRole() {
 
-    const user = useAuth();
+    const household = useContext(HouseholdContext);
 
-    const role = user.role;
-    const isAdmin = user.role === UserRole.admin; 
-    const isMember = user.role === UserRole.member; 
-    const isGuest = user.role === UserRole.guest; 
+    if(!household){
+        throw new Error("useRole doit être utilisé à l'intérieur d'un HouseHoldProvider");
+    }
+
+    const role = household.role;
+    const isAdmin = role === 'admin'; 
+    const isMember = role === 'member'; 
+    const isGuest = role === 'guest'; 
 
     return {role, isAdmin, isMember, isGuest};
 }

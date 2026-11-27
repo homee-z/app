@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { UnauthorizedError } from "@/lib/errors";
 import type { User } from "@/types/user.types";
 import { AuthProvider } from "@/components/context/AuthProvider";
+import { HouseholdProvider } from "@/components/context/HouseholdProvider";
+import { Household } from "@/types/household-types";
+import { getMyHouseholds } from "@/lib/households";
 
 export default async function ProtectedLayout({
   children,
@@ -10,9 +13,14 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   let user: User | null = null;
+  let household : Household[] = [];
 
   try {
-    user = await getCurrentUser();
+    [user, household] = await Promise.all([
+      await getCurrentUser(),
+      await getMyHouseholds()
+    ])
+
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect("/login");
@@ -24,13 +32,19 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  // if (user.householdId === null) {
-  //   redirect("/foyer");
-  // }
+  const defaultHousehold = household.find((household) =>(household.isDefault === true && household.status === 'active'));
+
+  console.log(defaultHousehold);
+
+  if (!defaultHousehold) {
+    redirect("/foyer");
+  }
 
   return (
     <AuthProvider user={user}>
-      {children}
+      <HouseholdProvider household={defaultHousehold}>
+        {children}
+      </HouseholdProvider>
     </AuthProvider>
   );
   
