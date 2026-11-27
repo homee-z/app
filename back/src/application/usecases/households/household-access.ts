@@ -4,7 +4,10 @@ import { HouseholdCode } from '../../../domain/value-objects/household-code.valu
 import { ConflictError } from '../../../domain/errors/conflict.error';
 import { ForbiddenError } from '../../../domain/errors/forbidden.error';
 import { NotFoundError } from '../../../domain/errors/not-found.error';
-import { HouseholdMemberRepositoryInterface } from '../../repositories/household-member.repository.interface';
+import {
+  DefaultHouseholdRepositoryInterface,
+  HouseholdMemberRepositoryInterface,
+} from '../../repositories/household-member.repository.interface';
 import { HouseholdRepositoryInterface } from '../../repositories/household.repository.interface';
 
 // Un non-membre (ou une demande en attente) reçoit 404 : on ne révèle pas l'existence du foyer.
@@ -52,6 +55,32 @@ export async function assertNotLastAdmin(
   const admins = await members.countActiveAdmins(target.householdId);
   if (admins <= 1) {
     throw new ConflictError('A household must keep at least one admin');
+  }
+}
+
+// Foyer par défaut parmi les adhésions d'un utilisateur : celle marquée, sinon la plus
+// ancienne adhésion active (undefined s'il n'a aucun foyer actif).
+export function pickDefaultMembership(
+  memberships: HouseholdMember[],
+): HouseholdMember | undefined {
+  const active = memberships.filter((m) => m.isActive());
+  if (active.length === 0) return undefined;
+  return (
+    active.find((m) => m.isDefault) ??
+    active.reduce((a, b) => (b.createdAt < a.createdAt ? b : a))
+  );
+}
+
+// Garantit qu'un utilisateur qui a au moins un foyer actif en a un par défaut.
+// À appeler après tout changement qui peut lui en donner un premier (validation)
+// ou lui retirer le sien (départ, exclusion, suppression du foyer).
+export async function ensureDefaultHousehold(
+  members: DefaultHouseholdRepositoryInterface,
+  userId: string,
+): Promise<void> {
+  const picked = pickDefaultMembership(await members.findByUser(userId));
+  if (picked && !picked.isDefault) {
+    await members.setDefault(userId, picked.householdId);
   }
 }
 

@@ -11,8 +11,8 @@ import {
   HouseholdRepositoryInterface,
 } from '../../../../application/repositories/household.repository.interface';
 import {
+  DefaultHouseholdRepositoryInterface,
   HOUSEHOLD_MEMBER_REPOSITORY,
-  HouseholdMemberRepositoryInterface,
 } from '../../../../application/repositories/household-member.repository.interface';
 import {
   USER_REPOSITORY,
@@ -29,10 +29,12 @@ import { KickMemberUsecase } from '../../../../application/usecases/households/k
 import { RegenerateCodeUsecase } from '../../../../application/usecases/households/regenerate-code.usecase';
 import { RenameHouseholdUsecase } from '../../../../application/usecases/households/rename-household.usecase';
 import { DeleteHouseholdUsecase } from '../../../../application/usecases/households/delete-household.usecase';
+import { SetDefaultHouseholdUsecase } from '../../../../application/usecases/households/set-default-household.usecase';
 import { HouseholdsController } from './households.controller';
 
 type Households = HouseholdRepositoryInterface;
-type Members = HouseholdMemberRepositoryInterface;
+// Le provider Postgres implémente aussi setDefault (foyer par défaut).
+type Members = DefaultHouseholdRepositoryInterface;
 type Users = UserRepositoryInterface;
 
 // Pas de module HTTP séparé (contrairement à Users) : AuthModule n'importe pas
@@ -54,9 +56,9 @@ type Users = UserRepositoryInterface;
     },
     {
       provide: CreateHouseholdUsecase,
-      useFactory: (households: Households) =>
-        new CreateHouseholdUsecase(households),
-      inject: [HOUSEHOLD_REPOSITORY],
+      useFactory: (households: Households, members: Members) =>
+        new CreateHouseholdUsecase(households, members),
+      inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
     },
     {
       provide: JoinHouseholdUsecase,
@@ -114,6 +116,11 @@ type Users = UserRepositoryInterface;
       useFactory: (households: Households, members: Members) =>
         new DeleteHouseholdUsecase(households, members),
       inject: [HOUSEHOLD_REPOSITORY, HOUSEHOLD_MEMBER_REPOSITORY],
+    },
+    {
+      provide: SetDefaultHouseholdUsecase,
+      useFactory: (members: Members) => new SetDefaultHouseholdUsecase(members),
+      inject: [HOUSEHOLD_MEMBER_REPOSITORY],
     },
   ],
   // Exportés pour les autres modules (shopping-lists, messages…) : ils importent

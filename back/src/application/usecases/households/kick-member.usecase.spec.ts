@@ -26,6 +26,38 @@ describe('KickMemberUsecase', () => {
     expect(await t.members.findByHousehold('h1')).toHaveLength(1);
   });
 
+  it('quitter son foyer par défaut : le plus ancien foyer actif restant le remplace', async () => {
+    const t = await setup();
+    await t.members.setDefault('u2', 'h1');
+    await t.addHousehold('x', 'h2', 'XYZ234');
+    await t.addMember('h2', 'u2');
+    await t.addHousehold('y', 'h3', 'QRS234');
+    await t.addMember('h3', 'u2');
+    await t.addHousehold('z', 'h4', 'TUV234');
+    await t.addMember('h4', 'u2', 'member', 'pending'); // jamais par défaut
+
+    await t.kick.execute('u2', 'h1', 'u2');
+
+    const mine = await t.members.findByUser('u2');
+    expect(mine.filter((m) => m.isDefault).map((m) => m.householdId)).toEqual([
+      'h2',
+    ]);
+  });
+
+  it('exclure un membre de son foyer par défaut le réattribue aussi ; sinon rien ne change', async () => {
+    const t = await setup();
+    await t.members.setDefault('u2', 'h1');
+    await t.addHousehold('x', 'h2', 'XYZ234');
+    await t.addMember('h2', 'u2');
+    await t.addMember('h2', 'u3', 'member', 'active', true);
+
+    await t.kick.execute('admin', 'h1', 'u2');
+    await t.kick.execute('u3', 'h1', 'u3'); // annule sa demande : son défaut ne bouge pas
+
+    expect((await t.members.findOne('h2', 'u2'))?.isDefault).toBe(true);
+    expect((await t.members.findOne('h2', 'u3'))?.isDefault).toBe(true);
+  });
+
   it('le dernier admin ne peut pas partir : 409', async () => {
     const t = await setup();
     await expect(t.kick.execute('admin', 'h1', 'admin')).rejects.toThrow(

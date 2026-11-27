@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HouseholdMember } from '../../../domain/entities/household-member.entity';
-import { IHouseholdMemberRepository } from '../../../application/repositories/household-member.repository.interface';
+import { DefaultHouseholdRepositoryInterface } from '../../../application/repositories/household-member.repository.interface';
 import { HouseholdMemberOrmEntity } from './household-member.orm-entity';
 
 @Injectable()
-export class HouseholdMemberPostgresRepository implements IHouseholdMemberRepository {
+export class HouseholdMemberPostgresRepository implements DefaultHouseholdRepositoryInterface {
   constructor(
     @InjectRepository(HouseholdMemberOrmEntity)
     private readonly repo: Repository<HouseholdMemberOrmEntity>,
@@ -46,6 +46,22 @@ export class HouseholdMemberPostgresRepository implements IHouseholdMemberReposi
     await this.repo.save(HouseholdMemberPostgresRepository.toOrm(member));
   }
 
+  // On retire d'abord l'ancien flag : sinon l'index unique partiel refuse le nouveau.
+  public async setDefault(userId: string, householdId: string): Promise<void> {
+    await this.repo.manager.transaction(async (em) => {
+      await em.update(
+        HouseholdMemberOrmEntity,
+        { userId, isDefault: true },
+        { isDefault: false },
+      );
+      await em.update(
+        HouseholdMemberOrmEntity,
+        { userId, householdId },
+        { isDefault: true },
+      );
+    });
+  }
+
   public async delete(id: string): Promise<void> {
     await this.repo.delete(id);
   }
@@ -58,6 +74,7 @@ export class HouseholdMemberPostgresRepository implements IHouseholdMemberReposi
       householdId: orm.householdId,
       role: orm.role,
       status: orm.status,
+      isDefault: orm.isDefault,
       createdAt: orm.createdAt,
     });
   }
@@ -69,6 +86,7 @@ export class HouseholdMemberPostgresRepository implements IHouseholdMemberReposi
     orm.householdId = member.householdId;
     orm.role = member.role;
     orm.status = member.status;
+    orm.isDefault = member.isDefault;
     orm.createdAt = member.createdAt;
     return orm;
   }

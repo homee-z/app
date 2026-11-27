@@ -28,6 +28,21 @@ describe('DeleteHouseholdUsecase', () => {
     expect(await t.members.findByHousehold('h2')).toHaveLength(1);
   });
 
+  it("les membres dont c'était le foyer par défaut récupèrent leur plus ancien foyer actif", async () => {
+    const t = await setup();
+    await t.members.setDefault('admin', 'h1');
+    await t.members.setDefault('u2', 'h1');
+    await t.addMember('h2', 'admin');
+    await t.addMember('h2', 'u4', 'member', 'active', true);
+
+    await t.remove.execute('admin', 'h1');
+
+    expect((await t.members.findOne('h2', 'admin'))?.isDefault).toBe(true);
+    expect((await t.members.findOne('h2', 'u4'))?.isDefault).toBe(true);
+    // u2 n'a plus aucun foyer : rien à réattribuer
+    expect(await t.members.findByUser('u2')).toHaveLength(0);
+  });
+
   it('un admin seul dans son foyer peut le supprimer (et donc en sortir)', async () => {
     const t = await setup();
     await t.remove.execute('autre', 'h2');

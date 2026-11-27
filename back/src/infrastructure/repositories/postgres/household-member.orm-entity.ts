@@ -19,6 +19,11 @@ import { UserOrmEntity } from './user.orm-entity';
 
 @Entity('household_members')
 @Unique('UQ_household_members_user_household', ['userId', 'householdId'])
+// Index unique partiel : un seul foyer par défaut par utilisateur.
+@Index('UQ_household_members_user_default', ['userId'], {
+  unique: true,
+  where: '"is_default" = true',
+})
 export class HouseholdMemberOrmEntity {
   @PrimaryColumn('uuid')
   id: string;
@@ -39,6 +44,9 @@ export class HouseholdMemberOrmEntity {
     enumName: 'household_member_status',
   })
   status: HouseholdMemberStatus;
+
+  @Column({ name: 'is_default', type: 'boolean', default: false })
+  isDefault: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

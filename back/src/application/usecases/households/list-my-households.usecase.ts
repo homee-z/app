@@ -1,8 +1,11 @@
 import { HouseholdRepositoryInterface } from '../../repositories/household.repository.interface';
 import { HouseholdMemberRepositoryInterface } from '../../repositories/household-member.repository.interface';
+import { pickDefaultMembership } from './household-access';
 import { HouseholdView, toHouseholdView } from './household-views';
 
 // Foyers de l'utilisateur, y compris ses demandes en attente (status 'pending').
+// Adhésions créées avant la colonne is_default : si aucun foyer actif n'est marqué,
+// le plus ancien est renvoyé comme foyer par défaut (même règle que ensureDefaultHousehold).
 export class ListMyHouseholdsUsecase {
   constructor(
     private readonly households: HouseholdRepositoryInterface,
@@ -14,6 +17,9 @@ export class ListMyHouseholdsUsecase {
     const households = await this.households.findByIds(
       memberships.map((m) => m.householdId),
     );
+
+    const fallback = pickDefaultMembership(memberships);
+    if (fallback) fallback.isDefault = true; // vue seulement, rien n'est enregistré
 
     const views: HouseholdView[] = [];
     for (const membership of memberships) {
