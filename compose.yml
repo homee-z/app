@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   front:
     build:
@@ -16,6 +14,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+      - API_URL=http://back:3001
     depends_on:
       - back
 

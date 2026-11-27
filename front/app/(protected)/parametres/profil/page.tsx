@@ -4,13 +4,13 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  ApiError,
   deleteAccount,
   getProfile,
   updateProfile,
-  type UserProfile,
 } from '@/lib/api/users.api';
+import { type UserProfile } from '@/types/user.types';
 import { HouseholdsCard } from './households-card';
+import { ApiError } from '@/lib/errors';
 
 const card = 'rounded-[18px] bg-white p-5 sm:rounded-[20px] sm:p-7';
 const cardTitle = 'font-display font-extrabold text-[15px] text-[#20241b] sm:text-base';

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { frenchError } from '@/lib/api/errors';
-import { listMyHouseholds, removeMember, type Household } from '@/lib/api/households.api';
+import { frenchError } from '@/lib/errors';
+import { listMyHouseholds, removeMember } from '@/lib/api/households.api';
+import { type Household } from '@/types/household-types';
 
 const card = 'rounded-[18px] bg-white p-5 sm:rounded-[20px] sm:p-7';
 const cardTitle = 'font-display text-[15px] font-extrabold text-[#20241b]';

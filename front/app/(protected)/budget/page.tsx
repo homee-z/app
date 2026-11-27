@@ -1,4 +1,8 @@
-export default function budget() {
+'use client'
+
+
+export default function Budget() {
+
     return(
         <div>
             <h1>budget</h1>
